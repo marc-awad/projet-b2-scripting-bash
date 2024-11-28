@@ -1,6 +1,7 @@
 #!/bin/bash
 
 fichier="taches.txt"
+touch $fichier
 
 afficher_menu(){
     echo -e "Bienvenue dans le gestionnaire de tâches.\n"
@@ -12,28 +13,70 @@ afficher_menu(){
 
 }
 
+prochain_id(){
+    echo $(($(wc -l < "$fichier") + 1))
+}
+
 ajouter_tache(){
-    true
+    description_tache=""
+    until [ -n "$description_tache" ];do
+        read -r -p "Veuillez saisir une tâche : " description_tache
+    done
+    echo "$(prochain_id);$description_tache" >> $fichier
+    echo "La tâche a été ajoutée avec succès."
+    return 0
 }
 
 afficher_taches(){
-    true
+    if ! [ -s "$fichier" ];then
+        echo "Aucune tâche à afficher."
+        return 1
+    fi
+    echo -e "Liste des tâches :\n"
+    awk -F';' '{print $1 ") " $2}' $fichier
+    return 0
 }
 
 supprimer_tache(){
-    true
+    local id_suppression=0
+    local nb_tache=0
+    nb_tache=$(wc -l < "$fichier")
+    if ! [ -s "$fichier" ];then
+        echo "Aucune tâche à supprimer."
+        return 1
+    fi
+    afficher_taches
+    until [ "$id_suppression" -ne 0 ]; do
+        read -r -p "Entrez un ID de tâche : " id_suppression
+        if [[ ! "$id_suppression" =~ ^[0-9]+$ ]]; then
+            echo "***Erreur : Veuillez entrer un nombre valide ***" >&2
+            id_suppression=0
+            continue
+        fi
+        if [ "$id_suppression" -gt "$nb_tache" ] || [ "$id_suppression" -eq 0 ]; then
+            echo "*** Erreur : Veuillez entrer un nombre entre 1 et $nb_tache ***" >&2
+            id_suppression=0
+            continue
+        fi
+        sed -i "${id_suppression}d" "$fichier"
+        echo "La tâche a été supprimée avec succès." 
+    done   
 }
 
 main(){
-    afficher_menu
-    until [ "$choix" -eq 4 ];do
+    choix=0
+    until [ "$choix" -eq 4 ]; do
+        afficher_menu
         read -r choix
         case "$choix" in
             1)
+                ajouter_tache
             ;;
             2)
+                afficher_taches
             ;;
             3)
+                supprimer_tache
             ;;
             4)
                 echo "Merci d'avoir utilisé le gestionnaire de tâches. À bientôt !"
