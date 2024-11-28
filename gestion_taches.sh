@@ -18,6 +18,12 @@ afficher_menu(){
 
 }
 
+#Fonction pour mettre à jour les ID dans le .txt après suppression d'un élément
+mettre_a_jour_id(){
+    awk -F';' '{ $1 = NR; OFS=";"; print $1, $2 }' "$fichier" > temp.txt
+    mv temp.txt "$fichier"
+}
+
 #Fonction qui récupère l'ID de la prochaine tâche à créer
 prochain_id(){
     echo $(($(wc -l < "$fichier") + 1))
@@ -67,6 +73,7 @@ supprimer_tache(){
         fi
         sed -i "${id_suppression}d" "$fichier"
         echo "La tâche a été supprimée avec succès."
+        mettre_a_jour_id
         break
     done
     return 0   
