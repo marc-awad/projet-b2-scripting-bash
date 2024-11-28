@@ -1,7 +1,10 @@
 #!/bin/bash
 
 fichier="taches.txt"
-touch $fichier
+
+if ! [ -e $fichier ];then
+    touch $fichier
+fi
 
 afficher_menu(){
     echo -e "Bienvenue dans le gestionnaire de tâches.\n"
@@ -46,21 +49,21 @@ supprimer_tache(){
         return 1
     fi
     afficher_taches
-    until [ "$id_suppression" -ne 0 ]; do
+    while true; do
         read -r -p "Entrez un ID de tâche : " id_suppression
         if [[ ! "$id_suppression" =~ ^[0-9]+$ ]]; then
             echo "***Erreur : Veuillez entrer un nombre valide ***" >&2
-            id_suppression=0
             continue
         fi
         if [ "$id_suppression" -gt "$nb_tache" ] || [ "$id_suppression" -eq 0 ]; then
             echo "*** Erreur : Veuillez entrer un nombre entre 1 et $nb_tache ***" >&2
-            id_suppression=0
             continue
         fi
         sed -i "${id_suppression}d" "$fichier"
-        echo "La tâche a été supprimée avec succès." 
-    done   
+        echo "La tâche a été supprimée avec succès."
+        break
+    done
+    return 0   
 }
 
 main(){
