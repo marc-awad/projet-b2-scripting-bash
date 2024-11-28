@@ -2,10 +2,12 @@
 
 fichier="taches.txt"
 
+#Vérification de l'existance du fichier avant de l'ajouter
 if ! [ -e $fichier ];then
     touch $fichier
 fi
 
+#Fonction qui affiche le menu
 afficher_menu(){
     echo -e "Bienvenue dans le gestionnaire de tâches.\n"
     echo -e "Veuillez choisir une option : \n"
@@ -16,10 +18,12 @@ afficher_menu(){
 
 }
 
+#Fonction qui récupère l'ID de la prochaine tâche à créer
 prochain_id(){
     echo $(($(wc -l < "$fichier") + 1))
 }
 
+#Fonction pour ajouter une tâche
 ajouter_tache(){
     description_tache=""
     until [ -n "$description_tache" ];do
@@ -30,6 +34,7 @@ ajouter_tache(){
     return 0
 }
 
+#Fonction pour afficher les tâches
 afficher_taches(){
     if ! [ -s "$fichier" ];then
         echo "Aucune tâche à afficher."
@@ -40,6 +45,7 @@ afficher_taches(){
     return 0
 }
 
+#Fonction pour supprimer les tâches
 supprimer_tache(){
     local id_suppression=0
     local nb_tache=0
@@ -66,8 +72,10 @@ supprimer_tache(){
     return 0   
 }
 
+#Fonction principale
 main(){
     choix=0
+    #Boucle principale des choix
     until [ "$choix" -eq 4 ]; do
         afficher_menu
         read -r choix
@@ -89,4 +97,5 @@ main(){
     done
 }
 
+#Appel de la fonction principale
 main
