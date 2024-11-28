@@ -99,7 +99,10 @@ main(){
             4)
                 echo "Merci d'avoir utilisé le gestionnaire de tâches. À bientôt !"
             ;;
-
+            *)
+                echo "Choix invalide : Veuillez choisir un choix entre 1 et 4."
+                choix=0
+            ;;
         esac
     done
 }
